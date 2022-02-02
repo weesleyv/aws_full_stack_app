@@ -36,13 +36,13 @@ import { nextTick } from "process";
         );
         const paths: string[] = [];
         paths.push(absolutePath);
-        res.sendFile(absolutePath);
+        res.status(200).sendFile(absolutePath);
         deleteLocalFiles(paths);
       } else {
         next();
       }
     } catch (error) {
-      res.status(404).send(error);
+      res.status(404).send({message: "something went wrong"});
     }
   });
   //! END @TODO1
