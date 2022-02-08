@@ -6,9 +6,8 @@ import {
   deleteLocalFiles,
   generateJwt,
   requireAuth,
+  registeredUser
 } from "./util/util";
-import { registeredUser } from "./util/util";
-
 
 
 import { nextTick } from "process";
