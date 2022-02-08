@@ -1,6 +1,12 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { filterImageFromURL, deleteLocalFiles } from "./util/util";
+import {
+  filterImageFromURL,
+  deleteLocalFiles,
+  generateJwt,
+  requireAuth,
+} from "./util/util";
+import { registeredUser } from "./util/util";
 import { nextTick } from "process";
 
 (async () => {
@@ -28,25 +34,60 @@ import { nextTick } from "process";
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-  app.get(`/filteredimage`, async (req, res, next) => {
-    try {
-      if (req.query.image_url) {
-        const absolutePath: string = await filterImageFromURL(
-          req.query.image_url
-        );
-        const paths: string[] = [];
-        paths.push(absolutePath);
-        res.status(200).sendFile(absolutePath);
-        deleteLocalFiles(paths);
-      } else {
-        next();
-      }
-    } catch (error) {
-      res.status(404).send({message: "something went wrong"});
-    }
-  });
-  //! END @TODO1
+  app.get(
+    `/filteredimage`,
+    requireAuth,
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      try {
+        if (req.query.image_url) {
+          const absolutePath: string = await filterImageFromURL(
+            req.query.image_url as string
+          );
 
+          const paths: string[] = [];
+          paths.push(absolutePath);
+          res.status(200).sendFile(absolutePath, (error) => {
+            if (error) {
+              console.log(error);
+            } else {
+              deleteLocalFiles(paths);
+            }
+          });
+        } else {
+          next();
+        }
+      } catch (error) {
+        res
+          .status(400)
+          .send({ message: "something went wrong, check image url!" });
+      }
+    }
+  );
+  //! END @TODO1
+  app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    console.log(req.body);
+    if (!email || !password) {
+      return res
+        .status(400)
+        .send({ auth: false, message: "email and password required" });
+    }
+
+    if (
+      email !== registeredUser.email ||
+      password !== registeredUser.password
+    ) {
+      return res.status(401).send({ auth: false, message: "Unauthorized" });
+    }
+
+    const jwt = generateJwt(registeredUser);
+    res.status(200).send({ auth: true, token: jwt, user: registeredUser });
+    console.log(req.headers.authorization);
+  });
   // Root Endpoint
   // Displays a simple message to the user
   app.get("/", async (req, res) => {
