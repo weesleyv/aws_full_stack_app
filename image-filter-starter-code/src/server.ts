@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+
 import {
   filterImageFromURL,
   deleteLocalFiles,
@@ -7,6 +8,9 @@ import {
   requireAuth,
 } from "./util/util";
 import { registeredUser } from "./util/util";
+
+import { filterImageFromURL, deleteLocalFiles } from "./util/util";
+
 import { nextTick } from "process";
 
 (async () => {
@@ -34,6 +38,7 @@ import { nextTick } from "process";
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+
   app.get(
     `/filteredimage`,
     requireAuth,
@@ -88,6 +93,27 @@ import { nextTick } from "process";
     res.status(200).send({ auth: true, token: jwt, user: registeredUser });
     console.log(req.headers.authorization);
   });
+
+  app.get(`/filteredimage`, async (req, res, next) => {
+    try {
+      if (req.query.image_url) {
+        const absolutePath: string = await filterImageFromURL(
+          req.query.image_url
+        );
+        const paths: string[] = [];
+        paths.push(absolutePath);
+        res.sendFile(absolutePath);
+        deleteLocalFiles(paths);
+      } else {
+        next();
+      }
+    } catch (error) {
+      res.status(404).send(error);
+    }
+  });
+  //! END @TODO1
+
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get("/", async (req, res) => {
