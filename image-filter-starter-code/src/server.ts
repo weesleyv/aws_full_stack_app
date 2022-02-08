@@ -9,7 +9,7 @@ import {
 } from "./util/util";
 import { registeredUser } from "./util/util";
 
-import { filterImageFromURL, deleteLocalFiles } from "./util/util";
+
 
 import { nextTick } from "process";
 
@@ -94,23 +94,7 @@ import { nextTick } from "process";
     console.log(req.headers.authorization);
   });
 
-  app.get(`/filteredimage`, async (req, res, next) => {
-    try {
-      if (req.query.image_url) {
-        const absolutePath: string = await filterImageFromURL(
-          req.query.image_url
-        );
-        const paths: string[] = [];
-        paths.push(absolutePath);
-        res.sendFile(absolutePath);
-        deleteLocalFiles(paths);
-      } else {
-        next();
-      }
-    } catch (error) {
-      res.status(404).send(error);
-    }
-  });
+
   //! END @TODO1
 
 
