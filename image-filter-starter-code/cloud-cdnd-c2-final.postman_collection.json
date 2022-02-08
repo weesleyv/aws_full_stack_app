@@ -37,7 +37,10 @@
 			"name": "http://localhost:8082/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [{
+					"key": "authorization",
+					"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsIiwicGFzc3dvcmQiOiJwYXNzd29yZCIsImlhdCI6MTY0NDI2OTYzMn0.GmmGwRcTPsnAK3hbGbAQIE3TS6FldbNjcwI15P1c3hU"
+				}],
 				"url": {
 					"raw": "http://{{HOST}}/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
 					"protocol": "http",
